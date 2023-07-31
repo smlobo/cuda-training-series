@@ -31,7 +31,7 @@ __global__ void mmul(const float *A, const float *B, float *C, int ds) {
   if ((idx < ds) && (idy < ds)){
     float temp = 0;
     for (int i = 0; i < ds; i++)
-      temp += A[FIXME*ds+i] * B[i*ds+FIXME];   // dot product of row and column
+      temp += A[idx*ds+i] * B[i*ds+idy];   // dot product of row and column
     C[idy*ds+idx] = temp;
   }
 }
@@ -54,7 +54,8 @@ int main(){
   for (int i = 0; i < DSIZE*DSIZE; i++){
     h_A[i] = A_val;
     h_B[i] = B_val;
-    h_C[i] = 0;}
+    h_C[i] = 0;
+  }
 
   // Initialization timing
   t1 = clock();
@@ -92,7 +93,13 @@ int main(){
 
   // Verify results
   cudaCheckErrors("kernel execution failure or cudaMemcpy H2D failure");
-  for (int i = 0; i < DSIZE*DSIZE; i++) if (h_C[i] != A_val*B_val*DSIZE) {printf("mismatch at index %d, was: %f, should be: %f\n", i, h_C[i], A_val*B_val*DSIZE); return -1;}
+  for (int i = 0; i < DSIZE*DSIZE; i++)
+    if (h_C[i] != A_val*B_val*DSIZE) {
+      printf("mismatch at index %d, was: %f, should be: %f\n", i, h_C[i], 
+        A_val*B_val*DSIZE);
+      return -1;
+    }
+  printf("Expected C value: %f\n", A_val*B_val*DSIZE);
   printf("Success!\n"); 
 
   return 0;
