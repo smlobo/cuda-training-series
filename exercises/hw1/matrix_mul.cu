@@ -17,7 +17,7 @@
     } while (0)
 
 
-const int DSIZE = 4096;
+const int DSIZE = 1024;
 const int block_size = 16;  // CUDA maximum is 1024 *total* threads in block
 const float A_val = 1.0f;
 const float B_val = 2.0f;

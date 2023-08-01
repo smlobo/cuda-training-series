@@ -17,8 +17,8 @@
     } while (0)
 
 
-const int DSIZE = 8192;
-const int block_size = 32;  // CUDA maximum is 1024 *total* threads in block
+const int DSIZE = 8;
+const int block_size = 2;  // CUDA maximum is 1024 *total* threads in block
 const float A_val = 3.0f;
 const float B_val = 2.0f;
 
@@ -31,27 +31,36 @@ __global__ void mmul(const float *A, const float *B, float *C, int ds) {
 
   int idx = threadIdx.x+blockDim.x*blockIdx.x; // create thread x index
   int idy = threadIdx.y+blockDim.y*blockIdx.y; // create thread y index
+  int index = idx*ds+idy;
+  printf("B[%d][%d]-T[%d][%d] Idx: %d, Idy: %d, index: %d\n", blockIdx.x, 
+    blockIdx.y, threadIdx.x, threadIdx.y, idx, idy, index);
 
   if ((idx < ds) && (idy < ds)){
     float temp = 0;
     for (int i = 0; i < ds/block_size; i++) {
 
       // Load data into shared memory
-      As[threadIdx.y][threadIdx.x] = A[FIXME];
-      Bs[threadIdx.y][threadIdx.x] = B[FIXME];
+      int Ax = idx;
+      int Ay = i * block_size + threadIdx.y;
+      As[threadIdx.x][threadIdx.y] = A[Ax*ds + Ay];
+      int Bx = i * block_size + threadIdx.x;
+      int By = idy;
+      Bs[threadIdx.x][threadIdx.y] = B[Bx*ds + By];
+      printf("  B[%d][%d]-T[%d][%d] A: [%d][%d], B: [%d][%d]\n", blockIdx.x, 
+        blockIdx.y, threadIdx.x, threadIdx.y, Ax, Ay, Bx, By);
 
       // Synchronize
       __syncthreads();
 
       // Keep track of the running sum
       for (int k = 0; k < block_size; k++)
-      	temp += As[FIXME][FIXME] * Bs[FIXME][FIXME]; // dot product of row and column
+      	temp += As[threadIdx.x][k] * Bs[k][threadIdx.y]; // dot product of row and column
       __syncthreads();
 
     }
 
     // Write to global memory
-    C[idy*ds+idx] = temp;
+    C[index] = temp;
   }
 }
 
@@ -112,7 +121,12 @@ int main(){
 
   // Verify results
   cudaCheckErrors("kernel execution failure or cudaMemcpy H2D failure");
-  for (int i = 0; i < DSIZE*DSIZE; i++) if (h_C[i] != A_val*B_val*DSIZE) {printf("mismatch at index %d, was: %f, should be: %f\n", i, h_C[i], A_val*B_val*DSIZE); return -1;}
+  for (int i = 0; i < DSIZE*DSIZE; i++) 
+    if (h_C[i] != A_val*B_val*DSIZE) {
+      printf("mismatch at index %d, was: %f, should be: %f\n", i, h_C[i], A_val*B_val*DSIZE);
+      return -1;
+    }
+  printf("Expected C value: %f\n", A_val*B_val*DSIZE);
   printf("Success!\n"); 
   return 0;
 }
