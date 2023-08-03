@@ -1,0 +1,18 @@
+sudo /usr/local/cuda-9.0/bin/nvprof --print-gpu-trace ./vector_add
+==31233== NVPROF is profiling process 31233, command: ./vector_add
+A[0] = 0.840188
+B[0] = 0.394383
+C[0] = 0.000000
+==31233== Profiling application: ./vector_add
+==31233== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput  SrcMemType  DstMemType           Device   Context    Stream  Name
+181.74ms  21.391ms                    -               -         -         -         -  128.00MB  5.8435GB/s    Pageable      Device  GeForce GT 650M         1         7  [CUDA memcpy HtoD]
+203.26ms  21.257ms                    -               -         -         -         -  128.00MB  5.8803GB/s    Pageable      Device  GeForce GT 650M         1         7  [CUDA memcpy HtoD]
+224.53ms  8.4013ms            (800 1 1)      (1024 1 1)        10        0B        0B         -           -           -           -  GeForce GT 650M         1         7  vadd(float const *, float const *, float*, int) [114]
+232.94ms  22.250ms                    -               -         -         -         -  128.00MB  5.6180GB/s      Device    Pageable  GeForce GT 650M         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+SrcMemType: The type of source memory accessed by memory operation/copy
+DstMemType: The type of destination memory accessed by memory operation/copy

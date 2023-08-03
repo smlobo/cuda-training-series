@@ -1,0 +1,22 @@
+sudo /usr/local/cuda-9.0/bin/nvprof ./vector_add
+==29575== NVPROF is profiling process 29575, command: ./vector_add
+A[0] = 0.840188
+B[0] = 0.394383
+C[0] = 0.000000
+==29575== Profiling application: ./vector_add
+==29575== Profiling result:
+            Type  Time(%)      Time     Calls       Avg       Min       Max  Name
+ GPU activities:   99.47%  11.8460s         1  11.8460s  11.8460s  11.8460s  vadd(float const *, float const *, float*, int)
+                    0.36%  42.673ms         2  21.337ms  21.326ms  21.347ms  [CUDA memcpy HtoD]
+                    0.17%  20.831ms         1  20.831ms  20.831ms  20.831ms  [CUDA memcpy DtoH]
+      API calls:   99.51%  11.9099s         3  3.96996s  21.342ms  11.8671s  cudaMemcpy
+                    0.48%  57.591ms         3  19.197ms  299.99us  56.984ms  cudaMalloc
+                    0.01%  804.21us        94  8.5550us     152ns  372.50us  cuDeviceGetAttribute
+                    0.00%  52.408us         1  52.408us  52.408us  52.408us  cudaLaunch
+                    0.00%  49.520us         1  49.520us  49.520us  49.520us  cuDeviceGetName
+                    0.00%  46.963us         1  46.963us  46.963us  46.963us  cuDeviceTotalMem
+                    0.00%  3.3420us         4     835ns     279ns  1.0570us  cudaGetLastError
+                    0.00%  2.0770us         1  2.0770us  2.0770us  2.0770us  cudaConfigureCall
+                    0.00%  1.7130us         4     428ns     157ns     718ns  cudaSetupArgument
+                    0.00%  1.7010us         3     567ns     216ns  1.1950us  cuDeviceGetCount
+                    0.00%     759ns         2     379ns     166ns     593ns  cuDeviceGet
