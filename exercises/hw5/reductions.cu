@@ -17,50 +17,50 @@
 const size_t N = 8ULL*1024ULL*1024ULL;  // data size
 //const size_t N = 256*640; // data size
 const int BLOCK_SIZE = 256;  // CUDA maximum is 1024
+
 // naive atomic reduction kernel
 __global__ void atomic_red(const float *gdata, float *out){
-  size_t idx = threadIdx.x+blockDim.x*blockIdx.x;
-  if (idx < N) atomicAdd(out, gdata[idx]);
+    size_t idx = threadIdx.x+blockDim.x*blockIdx.x;
+    if (idx < N) atomicAdd(out, gdata[idx]);
 }
 
 __global__ void reduce(float *gdata, float *out){
-     __shared__ float sdata[BLOCK_SIZE];
-     int tid = threadIdx.x;
-     sdata[tid] = 0.0f;
-     size_t idx = threadIdx.x+blockDim.x*blockIdx.x;
+    __shared__ float sdata[BLOCK_SIZE];
+    int tid = threadIdx.x;
+    sdata[tid] = 0.0f;
+    size_t idx = threadIdx.x+blockDim.x*blockIdx.x;
 
-     while (idx < N) {  // grid stride loop to load data
+    while (idx < N) {  // grid stride loop to load data
         sdata[tid] += gdata[idx];
         idx += gridDim.x*blockDim.x;  
-        }
+    }
 
-     for (unsigned int s=blockDim.x/2; s>0; s>>=1) {
+    for (unsigned int s=blockDim.x/2; s>0; s>>=1) {
         __syncthreads();
         if (tid < s)  // parallel sweep reduction
             sdata[tid] += sdata[tid + s];
-        }
-     if (tid == 0) out[blockIdx.x] = sdata[0];
-  }
+    }
+    if (tid == 0) out[blockIdx.x] = sdata[0];
+}
 
- __global__ void reduce_a(float *gdata, float *out){
-     __shared__ float sdata[BLOCK_SIZE];
-     int tid = threadIdx.x;
-     sdata[tid] = 0.0f;
-     size_t idx = threadIdx.x+blockDim.x*blockIdx.x;
+__global__ void reduce_a(float *gdata, float *out){
+    __shared__ float sdata[BLOCK_SIZE];
+    int tid = threadIdx.x;
+    sdata[tid] = 0.0f;
+    size_t idx = threadIdx.x+blockDim.x*blockIdx.x;
 
-     while (idx < N) {  // grid stride loop to load data
+    while (idx < N) {  // grid stride loop to load data
         sdata[tid] += gdata[idx];
         idx += gridDim.x*blockDim.x;  
-        }
+    }
 
-     for (unsigned int s=blockDim.x/2; s>0; s>>=1) {
+    for (unsigned int s=blockDim.x/2; s>0; s>>=1) {
         __syncthreads();
         if (tid < s)  // parallel sweep reduction
             sdata[tid] += sdata[tid + s];
-        }
-     if (tid == 0) atomicAdd(out, sdata[0]);
-  }
-
+    }
+    if (tid == 0) atomicAdd(out, sdata[0]);
+}
 
 __global__ void reduce_ws(float *gdata, float *out){
      __shared__ float sdata[32];
@@ -123,6 +123,21 @@ int main(){
   if (*h_sum != (float)N) {printf("atomic sum reduction incorrect!\n"); return -1;}
   printf("atomic sum reduction correct!\n");
   const int blocks = 640;
+  cudaMemset(d_sum, 0, sizeof(float));
+  cudaCheckErrors("cudaMemset failure");
+  float *d_blocksum;
+  cudaMalloc(&d_blocksum, blocks*sizeof(float));
+  //cuda processing sequence step 1 is complete
+  reduce<<<blocks, BLOCK_SIZE>>>(d_A, d_blocksum);
+  atomic_red<<<1,blocks>>>(d_blocksum, d_sum);
+  cudaCheckErrors("reduction WITHOUT atomic kernel launch failure");
+  //cuda processing sequence step 2 is complete
+  // copy vector sums from device to host:
+  cudaMemcpy(h_sum, d_sum, sizeof(float), cudaMemcpyDeviceToHost);
+  //cuda processing sequence step 3 is complete
+  cudaCheckErrors("reduction WITHOUT atomic kernel execution failure or cudaMemcpy H2D failure");
+  if (*h_sum != (float)N) {printf("reduction WITHOUT atomic sum incorrect!\n"); return -1;}
+  printf("reduction WITHOUT atomic sum correct!\n");
   cudaMemset(d_sum, 0, sizeof(float));
   cudaCheckErrors("cudaMemset failure");
   //cuda processing sequence step 1 is complete
