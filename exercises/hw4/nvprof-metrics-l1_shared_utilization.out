@@ -1,0 +1,17 @@
+sudo /usr/local/cuda-9.0/bin/nvprof --metrics l1_shared_utilization ./matrix_sums
+[Matrix sum for 8192x8192]
+==23449== NVPROF is profiling process 23449, command: ./matrix_sums
+==23449== Some kernel(s) will be replayed on device 0 in order to collect all events/metrics.
+Replaying kernel "row_sums(float const *, float*, unsigned long)" (done)
+row sums correct!read_l1_sector_queries
+Replaying kernel "column_sums(float const *, float*, unsigned long)" (done)
+column sums correct!te_l1_sector_queries
+==23449== Profiling application: ./matrix_sums
+==23449== Profiling result:
+==23449== Metric result:
+Invocations                               Metric Name                        Metric Description         Min         Max         Avg
+Device "GeForce GT 650M (0)"
+    Kernel: column_sums(float const *, float*, unsigned long)
+          1                     l1_shared_utilization              L1/Shared Memory Utilization     Low (2)     Low (2)     Low (2)
+    Kernel: row_sums(float const *, float*, unsigned long)
+          1                     l1_shared_utilization              L1/Shared Memory Utilization     Low (1)     Low (1)     Low (1)

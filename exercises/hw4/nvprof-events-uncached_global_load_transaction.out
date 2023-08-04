@@ -1,0 +1,14 @@
+sudo /usr/local/cuda-9.0/bin/nvprof --events uncached_global_load_transaction ./matrix_sums
+[Matrix sum for 8192x8192]
+==24063== NVPROF is profiling process 24063, command: ./matrix_sums
+row sums correct!
+column sums correct!
+==24063== Profiling application: ./matrix_sums
+==24063== Profiling result:
+==24063== Event result:
+Invocations                                Event Name         Min         Max         Avg       Total
+Device "GeForce GT 650M (0)"
+    Kernel: column_sums(float const *, float*, unsigned long)
+          1          uncached_global_load_transaction     2097152     2097152     2097152     2097152
+    Kernel: row_sums(float const *, float*, unsigned long)
+          1          uncached_global_load_transaction    67108864    67108864    67108864    67108864

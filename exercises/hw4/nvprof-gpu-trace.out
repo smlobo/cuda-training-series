@@ -1,0 +1,20 @@
+sudo /usr/local/cuda-9.0/bin/nvprof --print-gpu-trace ./matrix_sums
+[Matrix sum for 8192x8192]
+==23110== NVPROF is profiling process 23110, command: ./matrix_sums
+row sums correct!
+column sums correct!
+==23110== Profiling application: ./matrix_sums
+==23110== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput  SrcMemType  DstMemType           Device   Context    Stream  Name
+178.17ms  42.718ms                    -               -         -         -         -  256.00MB  5.8523GB/s    Pageable      Device  GeForce GT 650M         1         7  [CUDA memcpy HtoD]
+220.90ms  114.53ms             (32 1 1)       (256 1 1)        28        0B        0B         -           -           -           -  GeForce GT 650M         1         7  row_sums(float const *, float*, unsigned long) [111]
+335.43ms  8.2880us                    -               -         -         -         -  32.000KB  3.6821GB/s      Device    Pageable  GeForce GT 650M         1         7  [CUDA memcpy DtoH]
+335.51ms  6.4640us                    -               -         -         -         -  32.000KB  4.7212GB/s      Device           -  GeForce GT 650M         1         7  [CUDA memset]
+335.54ms  6.7857ms             (32 1 1)       (256 1 1)        32        0B        0B         -           -           -           -  GeForce GT 650M         1         7  column_sums(float const *, float*, unsigned long) [120]
+342.34ms  8.2880us                    -               -         -         -         -  32.000KB  3.6821GB/s      Device    Pageable  GeForce GT 650M         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+SrcMemType: The type of source memory accessed by memory operation/copy
+DstMemType: The type of destination memory accessed by memory operation/copy
