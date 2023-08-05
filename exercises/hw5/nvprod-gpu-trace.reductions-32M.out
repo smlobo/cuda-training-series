@@ -1,0 +1,29 @@
+sudo /usr/local/cuda-9.0/bin/nvprof --print-gpu-trace ./reductions
+==6384== NVPROF is profiling process 6384, command: ./reductions
+atomic sum reduction correct!
+reduction WITHOUT atomic sum correct!
+reduction w/atomic sum correct!
+reduction warp shuffle sum correct!
+==6384== Profiling application: ./reductions
+==6384== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput  SrcMemType  DstMemType           Device   Context    Stream  Name
+183.29ms  21.499ms                    -               -         -         -         -  128.00MB  5.8144GB/s    Pageable      Device  GeForce GT 650M         1         7  [CUDA memcpy HtoD]
+204.79ms  2.3680us                    -               -         -         -         -        4B  1.6109MB/s      Device           -  GeForce GT 650M         1         7  [CUDA memset]
+204.80ms  13.680ms         (131072 1 1)       (256 1 1)        10        0B        0B         -           -           -           -  GeForce GT 650M         1         7  atomic_red(float const *, float*) [112]
+218.48ms  2.6560us                    -               -         -         -         -        4B  1.4363MB/s      Device    Pageable  GeForce GT 650M         1         7  [CUDA memcpy DtoH]
+218.52ms  7.1030us                    -               -         -         -         -        4B  549.94KB/s      Device           -  GeForce GT 650M         1         7  [CUDA memset]
+218.86ms  5.7401ms            (640 1 1)       (256 1 1)        12  1.0000KB        0B         -           -           -           -  GeForce GT 650M         1         7  reduce(float*, float*) [122]
+224.61ms  3.0400us              (1 1 1)       (640 1 1)        10        0B        0B         -           -           -           -  GeForce GT 650M         1         7  atomic_red(float const *, float*) [126]
+224.61ms  3.0400us                    -               -         -         -         -        4B  1.2548MB/s      Device    Pageable  GeForce GT 650M         1         7  [CUDA memcpy DtoH]
+224.64ms  8.4160us                    -               -         -         -         -        4B  464.15KB/s      Device           -  GeForce GT 650M         1         7  [CUDA memset]
+224.66ms  5.4721ms            (640 1 1)       (256 1 1)        11  1.0000KB        0B         -           -           -           -  GeForce GT 650M         1         7  reduce_a(float*, float*) [135]
+230.14ms  2.6560us                    -               -         -         -         -        4B  1.4363MB/s      Device    Pageable  GeForce GT 650M         1         7  [CUDA memcpy DtoH]
+230.17ms  8.8320us                    -               -         -         -         -        4B  442.28KB/s      Device           -  GeForce GT 650M         1         7  [CUDA memset]
+230.19ms  4.9797ms            (640 1 1)       (256 1 1)        12      128B        0B         -           -           -           -  GeForce GT 650M         1         7  reduce_ws(float*, float*) [144]
+235.17ms  2.4640us                    -               -         -         -         -        4B  1.5482MB/s      Device    Pageable  GeForce GT 650M         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+SrcMemType: The type of source memory accessed by memory operation/copy
+DstMemType: The type of destination memory accessed by memory operation/copy

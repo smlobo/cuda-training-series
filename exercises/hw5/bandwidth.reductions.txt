@@ -1,0 +1,7 @@
+
+reductions.cu
+
+Warp Shuffle
+8MB sum :  8MB / 1.3063ms = 6.154 GB/s
+32MB sum : 8MB / 4.9797ms = 6.426 GB/s
+

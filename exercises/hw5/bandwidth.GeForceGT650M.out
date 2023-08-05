@@ -1,0 +1,23 @@
+./bandwidthTest 
+[CUDA Bandwidth Test] - Starting...
+Running on...
+
+ Device 0: GeForce GT 650M
+ Quick Mode
+
+ Host to Device Bandwidth, 1 Device(s)
+ PINNED Memory Transfers
+   Transfer Size (Bytes)	Bandwidth(MB/s)
+   33554432			6344.3
+
+ Device to Host Bandwidth, 1 Device(s)
+ PINNED Memory Transfers
+   Transfer Size (Bytes)	Bandwidth(MB/s)
+   33554432			6419.4
+
+ Device to Device Bandwidth, 1 Device(s)
+ PINNED Memory Transfers
+   Transfer Size (Bytes)	Bandwidth(MB/s)
+   33554432			43682.7
+
+Result = PASS
